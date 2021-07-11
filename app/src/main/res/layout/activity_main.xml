@@ -11,6 +11,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Add Shop"
+        android:layout_gravity="right"
         android:id="@+id/addshop"
       />
     <androidx.recyclerview.widget.RecyclerView

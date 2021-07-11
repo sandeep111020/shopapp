@@ -44,7 +44,7 @@ import java.util.Calendar;
 import java.util.List;
 
 
-public class ShopsAdapter extends FirebaseRecyclerAdapter<shopmodel, ShopsAdapter.myviewholder> implements Filterable {
+public class ShopsAdapter extends RecyclerView.Adapter<ShopsAdapter.ViewHolder>  {
 
 
     Context context;
@@ -53,33 +53,40 @@ public class ShopsAdapter extends FirebaseRecyclerAdapter<shopmodel, ShopsAdapte
     String itemkey;
 
 
-    private List<shopmodel> exampleList;
-    private List<shopmodel> exampleListFull;
-    public ShopsAdapter(@NonNull FirebaseRecyclerOptions<shopmodel> options, Context context) {
-        super(options);
+    private ArrayList<shopmodel> exampleList;
+
+    public ShopsAdapter(ArrayList<shopmodel> exampleList, Context context) {
+        this.exampleList = exampleList;
         this.context = context;
-
-
     }
 
 
-
+    public void filterList(ArrayList<shopmodel> filterllist) {
+        // below line is to add our filtered
+        // list in our course array list.
+        exampleList = filterllist;
+        // below line is to notify our adapter
+        // as change in recycler view data.
+        notifyDataSetChanged();
+    }
 
     @NonNull
     @Override
-    public com.example.shopsapp.ShopsAdapter.myviewholder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public ShopsAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        // below line is to inflate our layout.
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.shopsdisplaylayout, parent, false);
-
-        return new com.example.shopsapp.ShopsAdapter.myviewholder(view);
+        return new ViewHolder(view);
     }
 
     @Override
-    protected void onBindViewHolder(@NonNull myviewholder holder, int position, @NonNull shopmodel model) {
+    public void onBindViewHolder(@NonNull ShopsAdapter.ViewHolder holder, int position) {
+        // setting data to our views of recycler view.
+        shopmodel model = exampleList.get(position);
         holder.name.setText("Name: "+model.getName());
         holder.number.setText("Number :"+model.getNumber());
 
-        itemkey= getRef(position).getKey();
 
+        holder.items.setText("Items: "+model.getItems());
         holder.location.setText("City: "+model.getCity());
         Glide.with(context).load(model.getUrl()).into(holder.image);
 
@@ -98,75 +105,35 @@ public class ShopsAdapter extends FirebaseRecyclerAdapter<shopmodel, ShopsAdapte
                 context.startActivity(i);
             }
         });
-
-
-
     }
 
+    @Override
+    public int getItemCount() {
+        // returning the size of array list.
+        return exampleList.size();
+    }
 
+    public class ViewHolder extends RecyclerView.ViewHolder {
 
-    class myviewholder extends RecyclerView.ViewHolder {
-
-        TextView name, number,location;
-
-
+        // creating variables for our views.
+        private TextView name,number,location,items;
         Button viewmore;
-
         ImageView image;
 
-        public myviewholder(@NonNull View itemView) {
+        public ViewHolder(@NonNull View itemView) {
             super(itemView);
-
+            // initializing our views with their ids.
             name = (TextView) itemView.findViewById(R.id.Specname);
             number = (TextView) itemView.findViewById(R.id.Specnumber);
             location=itemView.findViewById(R.id.Speccity);
             image = itemView.findViewById(R.id.specimage);
+            items=itemView.findViewById(R.id.Specitems);
             viewmore=itemView.findViewById(R.id.showstatus);
-
-
-
         }
     }
- /*   @Override
-    public int getItemCount() {
-        return exampleList.size();
-    }
-*/
-    @Override
-    public Filter getFilter() {
-        return exampleFilter;
-    }
-
-    private Filter exampleFilter = new Filter() {
-        @Override
-        protected FilterResults performFiltering(CharSequence constraint) {
-            List<shopmodel> filteredList = new ArrayList<>();
-
-            if (constraint == null || constraint.length() == 0) {
-                filteredList.addAll(exampleListFull);
-            } else {
-                String filterPattern = constraint.toString().toLowerCase().trim();
-
-                for (shopmodel item : exampleListFull) {
-                    if (item.getItems().toLowerCase().contains(filterPattern)) {
-                        filteredList.add(item);
-                    }
-                }
-            }
-
-            FilterResults results = new FilterResults();
-            results.values = filteredList;
-
-            return results;
-        }
-
-        @Override
-        protected void publishResults(CharSequence constraint, FilterResults results) {
-            exampleList.clear();
-            exampleList.addAll((List) results.values);
-            notifyDataSetChanged();
-        }
-    };
-
-
 }
+
+
+
+
+
